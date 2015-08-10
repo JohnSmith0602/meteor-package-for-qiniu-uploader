@@ -1,4 +1,6 @@
-# 七牛储存 meteor SDK
+# 七牛储存的meteor SDK
+
+安装：`meteor add chenkaic4:qiniu-uploader`
 
 > 只需要创建两个 `template`，就可以**高度定制**七牛上传控件
 
