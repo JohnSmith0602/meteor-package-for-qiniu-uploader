@@ -1,6 +1,7 @@
 # 七牛储存的meteor SDK
 
 安装：`meteor add chenkaic4:qiniu-uploader`
+[DEMO](https://github.com/chenkaiC4/qiniu-package-demo)
 
 > 只需要创建两个 `template`，就可以**高度定制**七牛上传控件
 
@@ -45,3 +46,4 @@
     </div>
 </template>
 ```
+
