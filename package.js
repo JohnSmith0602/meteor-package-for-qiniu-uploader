@@ -1,6 +1,6 @@
 Package.describe({
-  name: 'chenkaiC4:qiniu-uploader',
-  version: '0.0.1',
+  name: 'chenkaic4:qiniu-uploader',
+  version: '0.0.2',
   summary: 'package for qiniu cloud storage',
   git: 'git@github.com:chenkaiC4/meteor-package-for-qiniu-uploader.git',
   documentation: 'README.md'
@@ -40,6 +40,5 @@ Package.onUse(function(api) {
 
 Package.onTest(function(api) {
   api.use('tinytest');
-  api.use('qiniu');
   api.addFiles('qiniu-tests.js');
 });
