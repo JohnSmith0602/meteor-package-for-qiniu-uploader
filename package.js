@@ -1,8 +1,8 @@
 Package.describe({
-  name: 'qiniu',
+  name: 'chenkaiC4:qiniu-uploader',
   version: '0.0.1',
   summary: 'package for qiniu cloud storage',
-  git: '',
+  git: 'git@github.com:chenkaiC4/meteor-package-for-qiniu-uploader.git',
   documentation: 'README.md'
 });
 
