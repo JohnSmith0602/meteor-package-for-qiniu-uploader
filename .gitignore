@@ -1,3 +1,6 @@
 .idea
 .npm
 .npm/
+.meteor/local
+.meteor/meteorite
+
