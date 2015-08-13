@@ -831,5 +831,7 @@ function QiniuJsSDK() {
 
 }
 
-// export Qiniu to client side
+// 对源代码的改动，删除 var，暴露到全局供 meteor package导出
+// var Qiniu = new QiniuJsSDK();
+
 Qiniu = new QiniuJsSDK();

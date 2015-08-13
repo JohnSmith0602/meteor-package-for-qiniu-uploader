@@ -1,49 +1,95 @@
 # 七牛储存的meteor SDK
 
-安装：`meteor add chenkaic4:qiniu-uploader`
+
 [DEMO](https://github.com/chenkaiC4/qiniu-package-demo)
 
-> 只需要创建两个 `template`，就可以**高度定制**七牛上传控件
+## 安装
 
-第一个`template`，作为包裹层，包裹本package提供的名为`qiniuUploader`的`template`。
-第二个`template`定义具体的上传控件的`html`，`css`，从而达到高度定制的效果。
+`meteor add chenkaic4:qiniu-uploader`
 
-具体使用，请看如下示例：
+## 使用方法 
 
-**第一个包裹层`template`，主要负责引用该package**
-参数说明（必填）：
-- bucket：该控件对应的上传 bucket
-- domain：该bucket对应的域名空间
-- templateName：对应第二个`template`的名字，该template具体定义上传控件
-- targetId：css ID，点击该dom元素，弹出文件选择框
+- 服务端配置方法
 
-``` html
-<template name="uploadWrap">
-    {{> qiniuUploader
-        bucket="test-bucket"
-        domain="<bucket 对应的域名地址>"
-        templateName='upload'
-        cssId='pickfiles'
-    }}
-</template>
+``` javascript
+var config = {
+  'ak': String,                       // 必填 <ACCESS_KEY>
+  'sk': String,                       // 必填 <SECRET_KEY>
+  'domain'   String,                  // 可选 开启回调模式，指定服务器地址
+  'callbackRoute': String,            // 可选 回调的路由名，不用加'/'，默认为'qiniu_callback'
+  'buckets': Array                    // 可选 bucket 配置
+  
+  /* buckets 的元素结构
+    {
+      'name': String,                 // bucket 名字
+      'onUploaded': function          // 资源上传到 bucket 后的回调函数
+      'callbackBody': String          // 回调的内容 key=$(key)&bucket=$(bucket)&userId=$(x:userId)
+    }
+  */
+}
+// 生成实例
+var qiniu = new QiniuSDK(config);
+// 添加单个 bucket
+qiniu.addBucket(bucket);  // 可以获取token了，背后设置了 callbackUrl
+// 应用配置
+qiniuUploader.init();
 ```
 
-**第二个自定义上传控件`template`，主要负责自由定义上传组件的html结构，注意对应 cssId**
+- 客户端配置方法
 
-``` html
-<template name="upload">
-    <div class="container">
-        <div class="body">
-            <div class="col-md-12">
-                <div id="container">
-                    <a class="btn btn-default btn-lg " id="pickfiles" href="#" >
-                        <i class="glyphicon glyphicon-plus"></i>
-                        <sapn>选择文件</sapn>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</template>
+在上传按钮所在的 `template` 的 `onRender` 中进行如下配置
+
+``` javascript
+var settings = {
+  bucket: 'test-bucket',                            // 必选 bucket 名字
+  browse_button: 'pickfiles',                       // 必选 上传按钮的 css id
+  domain: 'http://7xl03g.dl1.z0.glb.clouddn.com',   // 可选 bucket 域名，提供下载链接
+  x_vars: {                                         // 可选 回调时，POST 给服务端的内容
+    'time' : function(up, file) {
+      var time = (new Date()).getTime();
+      return time;
+    },
+    'userId' : function(up, file) {
+      return '123456';
+    }
+  },
+  bindListeners: {                                   // 上传状态和结果监听
+    'FilesAdded': function(up, files) {
+      plupload.each(files, function(file) {
+        // 文件添加进队列后,处理相关的事情
+      });
+    },
+    'BeforeUpload': function(up, file) {
+      // 每个文件上传前,处理相关的事情
+    },
+    'UploadProgress': function(up, file) {
+      // 每个文件上传时,处理相关的事情
+    },
+    'FileUploaded': function(up, file, info) {
+      // 每个文件上传成功后,处理相关的事情
+      // 其中 info 是文件上传成功后，服务端返回的json，形式如
+      // {
+      //    "hash": "Fh8xVqod2MQ1mocfI4S4KpRL6D98",
+      //    "key": "gogopher.jpg"
+      //  }
+      // 参考http://developer.qiniu.com/docs/v6/api/overview/up/response/simple-response.html
+      // var domain = up.getOption('domain');
+      // var res = parseJSON(info);
+      // var sourceLink = domain + res.key; 获取上传成功后的文件的Url
+    },
+    'Error': function(up, err, errTip) {
+      //上传出错时,处理相关的事情
+    },
+    'UploadComplete': function() {
+      //队列文件处理完毕后,处理相关的事情
+    }
+  }
+};
+
+// 在 `template` 的 upload 中配置并初始化上传功能
+Template.upload.onRendered(function() {
+  var uploader = new QiniuUploader(settings);
+  uploader.init();
+});
 ```
 

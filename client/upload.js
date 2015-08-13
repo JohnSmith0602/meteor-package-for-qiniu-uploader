@@ -1,93 +1,50 @@
-Template.qiniuUploader.onRendered(function() {
-  var params = Template.currentData(),
-      bucket = params.bucket,
-      domain = params.domain,
-      cssId = params.cssId;
+// 七牛前端上传控件
+QiniuUploader = function(settings) {
+  // 检测必选参数
+  var checkArgs = !settings.bucket || !settings.browse_button || !settings.domain;
+  if (checkArgs) {
+    throw new Error('请指定 bucket 以及对应的域名，并且指定响应上传点击的 dom 元素的 id 值为 browse_button');
+  };
 
-  // get token
-  Meteor.call('getQiniuBucketToken', bucket, function(err, token) {
+  var self = this;
+  this.bucket = settings.bucket;
+  this.domain = settings.domain;
+  this.cssId = settings.cssId;
+
+  // 自定义变量，参考 http://developer.qiniu.com/docs/v6/api/overview/up/response/vars.html
+  var defaultXVar = {};
+
+  // 配置 uplaoder 的参数，参考 https://github.com/qiniu/js-sdk
+  this.settings = {
+    runtimes: settings.runtimes || 'html5,flash,html4',
+    browse_button: settings.browse_button,            //**必需**
+    //uptoken_url: '/uptoken',                        // 本SDK推荐使用 Meteor.method 来获取 token
+    downtoken_url: settings.downtoken_url,            // Ajax请求downToken的Url，私有空间时使用,JS-SDK将向该地址POST文件的key和domain,服务端返回的JSON必须包含`url`字段，`url`值为该文件的下载地址
+    uptoken : '',                                     // 将在调用 init 方法时获得
+    unique_names: settings.unique_names || true,      // 默认 false，key为文件名。若开启该选项，SDK会为每个文件自动生成key（文件名）
+    domain: settings.domain,                          //bucket 域名，下载资源时用到，**必需**
+    container: settings.container,                    //上传区域DOM ID，默认是browser_button的父元素，
+    max_file_size: settings.max_file_size || '100mb', //最大文件体积限制
+    flash_swf_url: 'js/plupload/Moxie.swf',           //引入flash,相对路径
+    max_retries: settings.max_retries || 3,           //上传失败最大重试次数
+    dragdrop: settings.dragdrop || true,              //开启可拖曳上传
+    drop_element: settings.drop_element || settings.browse_button,        //拖曳上传区域元素的ID，拖曳文件或文件夹后可触发上传
+    chunk_size: settings.chunk_size || '4mb',                             //分块上传时，每片的体积
+    auto_start: true,                                                     //选择文件后自动上传，若关闭需要自己绑定事件触发上传,
+    x_vars : settings.x_vars,                      //自定义变量，用于回调函数
+    init: settings.bindListeners
+  };
+};
+
+
+// 获取 token 并初始化
+QiniuUploader.prototype.init = function() {
+  var self = this;
+  Meteor.call('getQiniuBucketToken', self.bucket, function(err, token) {
     if (!err) {
-      setUploader(token, domain, cssId);
+      console.log(token);
+      self.settings.uptoken = token;
+      self.uploader = Qiniu.uploader(self.settings);
     }
   });
-
-  /*
-  * token: bucket's access token
-  * domain: bucket's domain
-  * */
-  function setUploader (token, domain, cssId) {
-    var uploader = Qiniu.uploader({
-      runtimes: 'html5,flash,html4',
-      browse_button: cssId,
-      uptoken: token,
-      unique_names: true,
-      domain: domain,
-      //上传区域DOM ID，默认是browser_button的父元素
-      //container: '',
-      //拖曳上传区域元素的ID，拖曳文件或文件夹后可触发上传
-      drop_element: cssId,
-      max_file_size: '100mb',
-      flash_swf_url: 'js/plupload/Moxie.swf',
-      dragdrop: true,
-      max_retries: 3,
-      chunk_size: '4mb',
-      auto_start: true,
-
-      init: {
-        // 文件添加进队列后,处理相关的事情
-        'FilesAdded': function (up, files) {
-          plupload.each(files, function (file) {
-
-          });
-        },
-        // 每个文件上传前,处理相关的事情
-        'BeforeUpload': function (up, file) {
-
-        },
-        // 每个文件上传时,处理相关的事情
-        'UploadProgress': function (up, file) {
-
-        },
-        // 队列处理完毕
-        'UploadComplete': function () {
-          console.log('全部上传成功');
-        },
-        // 单个文件处理完毕
-        'FileUploaded': function (up, file, info) {
-          // 其中 info 是文件上传成功后，服务端返回的json，形式如
-          // {
-          //    "hash": "Fh8xVqod2MQ1mocfI4S4KpRL6D98",
-          //    "key": "gogopher.jpg"
-          //  }
-          console.log(file.name + ' --> **上传成功**');
-        },
-        //上传出错时,处理相关的事情
-        'Error': function (up, err, errTip) {
-
-        }
-      }
-    });
-
-    $('#container')
-      .on('dragenter', function (e) {
-        e.preventDefault();
-        $('#container').addClass('draging');
-        e.stopPropagation();
-      })
-      .on('drop', function (e) {
-        e.preventDefault();
-        $('#container').removeClass('draging');
-        e.stopPropagation();
-      })
-      .on('dragleave', function (e) {
-        e.preventDefault();
-        $('#container').removeClass('draging');
-        e.stopPropagation();
-      })
-      .on('dragover', function (e) {
-        e.preventDefault();
-        $('#container').addClass('draging');
-        e.stopPropagation();
-      });
-  }
-});
+};
