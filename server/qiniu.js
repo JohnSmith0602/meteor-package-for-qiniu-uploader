@@ -30,7 +30,7 @@ QiniuSDK = function(config) {
 
 // 加入bucket，并设置该 bucket 上传后的会调函数
 QiniuSDK.prototype.addBucket = function(config) {
-  var bucket = config.bucket;
+  var bucket = config.name;
   var callback = config.onUploaded;
   var callbackBody = config.callbackBody;
   if (this.buckets.hasOwnProperty(config.bucket)) {
