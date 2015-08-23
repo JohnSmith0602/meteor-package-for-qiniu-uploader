@@ -21,7 +21,7 @@ QiniuUploader = function(settings) {
     //uptoken_url: '/uptoken',                        // 本SDK推荐使用 Meteor.method 来获取 token
     downtoken_url: settings.downtoken_url,            // Ajax请求downToken的Url，私有空间时使用,JS-SDK将向该地址POST文件的key和domain,服务端返回的JSON必须包含`url`字段，`url`值为该文件的下载地址
     uptoken : '',                                     // 将在调用 init 方法时获得
-    unique_names: settings.unique_names || true,      // 默认 false，key为文件名。若开启该选项，SDK会为每个文件自动生成key（文件名）
+    unique_names: settings.unique_names || false,     // 默认 false，key为文件名。若开启该选项，SDK会为每个文件自动生成key（文件名）
     domain: settings.domain,                          //bucket 域名，下载资源时用到，**必需**
     container: settings.container,                    //上传区域DOM ID，默认是browser_button的父元素，
     max_file_size: settings.max_file_size || '100mb', //最大文件体积限制
@@ -42,7 +42,6 @@ QiniuUploader.prototype.init = function() {
   var self = this;
   Meteor.call('getQiniuBucketToken', self.bucket, function(err, token) {
     if (!err) {
-      console.log(token);
       self.settings.uptoken = token;
       self.uploader = Qiniu.uploader(self.settings);
     }
