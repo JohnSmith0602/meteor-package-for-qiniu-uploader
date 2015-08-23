@@ -15,7 +15,7 @@
 var config = {
   'ak': String,                       // 必填 <ACCESS_KEY>
   'sk': String,                       // 必填 <SECRET_KEY>
-  'domain'   String,                  // 可选 开启回调模式，指定服务器地址
+  'domain':  String,                  // 可选 开启回调模式，指定服务器地址
   'callbackRoute': String,            // 可选 回调的路由名，不用加'/'，默认为'qiniu_callback'
   'buckets': Array                    // 可选 bucket 配置
   
@@ -32,7 +32,7 @@ var qiniu = new QiniuSDK(config);
 // 添加单个 bucket
 qiniu.addBucket(bucket);  // 可以获取token了，背后设置了 callbackUrl
 // 应用配置
-qiniuUploader.init();
+qiniu.init();
 ```
 
 - 客户端配置方法
