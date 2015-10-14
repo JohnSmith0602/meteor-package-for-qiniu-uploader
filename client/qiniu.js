@@ -309,6 +309,15 @@ function QiniuJsSDK() {
             return key;
         };
 
+        var getUpTokenByKey = function(key, callback) {
+            var scope = op.bucket + ':' + key;
+            Meteor.call('getQiniuBucketTokenByScope', scope, function(err, token) {
+                if (!err) {
+                    callback(token);
+                }
+            });
+        };
+
         plupload.extend(option, op, {
             url: 'http://upload.qiniu.com',
             multipart_params: {
@@ -327,19 +336,24 @@ function QiniuJsSDK() {
             var auto_start = up.getOption && up.getOption('auto_start');
             auto_start = auto_start || (up.settings && up.settings.auto_start);
             if (auto_start) {
-                plupload.each(files, function(i, file) {
-                    up.start();
+                plupload.each(files, function(file, i) {
+                    // David：目前需要同名文件应该是可覆盖的。全面的判断之后完善。
+                    var key = getFileKey(up, file, that.key_handler);
+                    getUpTokenByKey(key, function(token) {
+                        that.key = key;
+                        that.token = token;
+
+                        up.start();
+                    });
                 });
             }
             up.refresh(); // Reposition Flash/Silverlight
         });
 
         uploader.bind('BeforeUpload', function(up, file) {
-
             ctx = '';
 
             var directUpload = function(up, file, func) {
-
                 var multipart_params_obj;
                 if (op.save_key) {
                     multipart_params_obj = {
@@ -347,7 +361,7 @@ function QiniuJsSDK() {
                     };
                 } else {
                     multipart_params_obj = {
-                        'key': getFileKey(up, file, func),
+                        'key': that.key,
                         'token': that.token
                     };
                 }
@@ -364,7 +378,6 @@ function QiniuJsSDK() {
                         }
                     }
                 }
-
 
                 up.setOption({
                     'url': 'http://upload.qiniu.com/',

@@ -1,8 +1,8 @@
 Package.describe({
-  name: 'chenkaic4:qiniu-uploader',
-  version: '0.0.3',
-  summary: 'package for qiniu cloud storage',
-  git: 'git@github.com:chenkaiC4/meteor-package-for-qiniu-uploader.git',
+  name: 'johnsmith0602:qiniu-uploader',
+  version: '0.0.2',
+  summary: 'package for uploading to Qiniu cloud storage',
+  git: 'git@github.com:JohnSmith0602/meteor-package-for-qiniu-uploader.git',
   documentation: 'README.md'
 });
 

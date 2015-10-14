@@ -1,11 +1,8 @@
 # 七牛储存的meteor SDK
 
-
-[DEMO](https://github.com/chenkaiC4/qiniu-package-demo)
-
 ## 安装
 
-`meteor add chenkaic4:qiniu-uploader`
+`meteor add johnsmith0602:qiniu-uploader`
 
 ## 使用方法 
 
@@ -93,3 +90,13 @@ Template.upload.onRendered(function() {
 });
 ```
 
+## 更新
+
+#### v0.0.2
+
+- （只）支持同名文件上传会覆盖前者
+
+#### v0.0.1
+
+- fork 自 https://github.com/chenkaiC4/meteor-package-for-qiniu-uploader
+- 多处基本功能的修复。

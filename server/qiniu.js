@@ -58,6 +58,9 @@ QiniuSDK.prototype.setTokenMethod = function() {
   Meteor.methods({
     'getQiniuBucketToken': function(bucketName) {
       return self.buckets[bucketName].putPolicy.token();
+    },
+    'getQiniuBucketTokenByScope': function(scope) {
+      return new qiniu.rs.PutPolicy(scope).token();
     }
   });
 };
@@ -78,9 +81,8 @@ QiniuSDK.prototype.setRESTRouter = function() {
           bucket = body.bucket;
       // 回调函数
       self.buckets[bucket].callback(body);
-      console.log(body);
       return body;
-    },
+    }
   });
 };
 

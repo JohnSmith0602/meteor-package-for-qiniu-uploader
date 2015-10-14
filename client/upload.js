@@ -4,7 +4,7 @@ QiniuUploader = function(settings) {
   var checkArgs = !settings.bucket || !settings.browse_button || !settings.domain;
   if (checkArgs) {
     throw new Error('请指定 bucket 以及对应的域名，并且指定响应上传点击的 dom 元素的 id 值为 browse_button');
-  };
+  }
 
   var self = this;
   this.bucket = settings.bucket;
@@ -32,7 +32,9 @@ QiniuUploader = function(settings) {
     chunk_size: settings.chunk_size || '4mb',                             //分块上传时，每片的体积
     auto_start: true,                                                     //选择文件后自动上传，若关闭需要自己绑定事件触发上传,
     x_vars : settings.x_vars,                      //自定义变量，用于回调函数
-    init: settings.bindListeners
+    init: settings.bindListeners,
+
+    bucket: settings.bucket   // 为了实现文件覆盖，PutPolicy 的 scope 值必须是 <bucket>:<key>，而 key 只能在上传文件后获取，需要在 directUpload 中根据 bucket 和 key 生成 uptoken
   };
 };
 
